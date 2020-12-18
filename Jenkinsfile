@@ -4,14 +4,17 @@ pipeline {
     stage('buzz build') {
       agent any
       steps {
-        sh '''ls
-jenkins/build.sh'''
+        sh '''pwd
+ls -lR
+#jenkins/build.sh'''
       }
     }
 
     stage('buzz test') {
       steps {
-        sh './jenkins/test-all.sh'
+        sh '''#./jenkins/test-all.sh
+pwd
+ls -lR'''
       }
     }
 
