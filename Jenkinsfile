@@ -6,6 +6,8 @@ pipeline {
       steps {
         sh '''pwd
 ls -lR
+cd jenkins
+./build.sh
 #jenkins/build.sh'''
       }
     }
