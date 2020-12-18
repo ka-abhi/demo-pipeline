@@ -7,7 +7,8 @@ pipeline {
         sh '''pwd
 ls -lR
 cd jenkins
-./build.sh
+pwd
+cat build.sh
 #jenkins/build.sh'''
       }
     }
