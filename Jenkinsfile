@@ -4,8 +4,8 @@ pipeline {
     stage('buzz build') {
       agent any
       steps {
-        sh 'ls'
-        sh './jenkins/build.sh'
+        sh '''ls
+jenkins/build.sh'''
       }
     }
 
