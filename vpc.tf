@@ -1,4 +1,4 @@
-resource "aws-vpc" "tfvpc" {
+resource "aws_vpc" "tfvpc" {
     cidr_block = "${var.cidr}"
     instance_tenancy = "${var.tenancy}"
     tags = {
