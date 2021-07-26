@@ -10,6 +10,9 @@ pipeline{
         disableConcurrentBuilds()
     }
     parameters {
+        string (name: 'ENV_NAME',
+			   defaultValue: 'tf-dev',
+			   description: 'Env name')
         choice (name: 'ACTION',
 				choices: [ 'plan', 'apply', 'destroy'],
 				description: 'Run terraform plan / apply / destroy')
@@ -25,7 +28,7 @@ pipeline{
         stage('INIT'){
             steps{
                 sh "terraform --version"
-                sh returnStatus: true, script: 'terraform workspace new dev'
+                sh returnStatus: true, script: "terraform workspace new ${ENV_NAME}"
                 sh "terraform init"
             }
         }
@@ -59,7 +62,7 @@ pipeline{
             steps{
                 script{
                     def DESTROY_APPROVED = input(
-                        message: "Destroy env !?!",
+                        message: "Destroy ${ENV_NAME} !?!",
                         ok: "Yes",
                         parameters: [
                             string(name: 'DESTROY_APPROVED', defaultValue: 'No', description: 'Are you sure??') 
