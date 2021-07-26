@@ -30,7 +30,7 @@ pipeline{
             }
         }
         stage('PLAN') {
-            when { anyof
+            when { anyOf
                 {
                     environment name: 'ACTION', value: 'plan';
                     environment name: 'ACTION', value: 'apply'
@@ -41,7 +41,7 @@ pipeline{
             }
         }
         stage('Apply') {
-            when { anyof
+            when { anyOf
                 {
                     environment name: 'ACTION', value: 'apply'
                 }
@@ -51,7 +51,7 @@ pipeline{
             }
         }
         stage('Destroy') {
-            when { anyof
+            when { anyOf
                 {
                     environment name: 'ACTION', value: 'destroy'
                 }
