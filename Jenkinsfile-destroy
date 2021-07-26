@@ -40,7 +40,7 @@ pipeline{
                 }
             }
             steps{
-                sh "terraform plan"
+                sh "terraform plan -var-file=dev.tfvars -out=tfplan"
             }
         }
         stage('Apply') {
@@ -50,7 +50,7 @@ pipeline{
                 }
             }
             steps{
-                sh "terraform apply -var-file=dev.tfvars -auto-approve"
+                sh "terraform apply -auto-approve tfplan"
             }
         }
         stage('Destroy') {
@@ -72,7 +72,7 @@ pipeline{
 						error "User cancelled"
 					}
                 }
-                sh "terraform destroy -var-file=dev.tfvars -auto-approve"
+                sh "terraform destroy -auto-approve"
             }
         }
     }
