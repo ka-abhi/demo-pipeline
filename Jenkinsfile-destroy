@@ -3,12 +3,65 @@ pipeline{
     environment {
         PATH = "${PATH}:${getTerraformPath()}"
     }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timestamps()
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+    parameters {
+        choice (name: 'ACTION',
+				choices: [ 'plan', 'apply', 'destroy'],
+				description: 'Run terraform plan / apply / destroy')
+    }
     stages{
         stage('INIT'){
             steps{
                 sh "terraform --version"
                 sh returnStatus: true, script: 'terraform workspace new dev'
                 sh "terraform init"
+            }
+        }
+        stage('PLAN') {
+            when { anyof
+                {
+                    environment name: 'ACTION', value: 'plan';
+                    environment name: 'ACTION', value: 'apply'
+                }
+            }
+            steps{
+                sh "terraform plan"
+            }
+        }
+        stage('Apply') {
+            when { anyof
+                {
+                    environment name: 'ACTION', value: 'apply'
+                }
+            }
+            steps{
+                sh "terraform apply -var-file=dev.tfvars -auto-approve"
+            }
+        }
+        stage('Destroy') {
+            when { anyof
+                {
+                    environment name: 'ACTION', value: 'destroy'
+                }
+            }
+            steps{
+                script{
+                    def DESTROY_APPROVED = input(
+                        message: "Destroy env !?!",
+                        ok: "Yes",
+                        parameters: [
+                            string(name: 'DESTROY_APPROVED', defaultValue: 'No', description: 'Are you sure??') 
+                        ]
+                    )
+                    if (DESTROY_APPROVED != 'Yes') {
+						error "User cancelled"
+					}
+                }
                 sh "terraform destroy -var-file=dev.tfvars -auto-approve"
             }
         }
