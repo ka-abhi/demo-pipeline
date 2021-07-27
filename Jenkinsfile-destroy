@@ -27,9 +27,11 @@ pipeline{
         }
         stage('INIT'){
             steps{
-                sh "terraform --version"
-                sh returnStatus: true, script: "terraform workspace new ${ENV_NAME}"
-                sh "terraform init"
+                dir("${ENV_NAME}"){
+                    sh "terraform --version"
+                    sh returnStatus: true, script: "terraform workspace new ${ENV_NAME}"
+                    sh "terraform init"
+                }
             }
         }
         stage('PLAN') {
@@ -40,7 +42,9 @@ pipeline{
                 }
             }
             steps{
-                sh "terraform plan -out=tfplan"
+                dir("${ENV_NAME}"){
+                    sh "terraform plan -out=tfplan"
+                }
             }
         }
         stage('Apply') {
@@ -50,7 +54,9 @@ pipeline{
                 }
             }
             steps{
-                sh "terraform apply -auto-approve tfplan"
+                dir("${ENV_NAME}"){
+                    sh "terraform apply -auto-approve tfplan"
+                }
             }
         }
         stage('Destroy') {
@@ -60,19 +66,21 @@ pipeline{
                 }
             }
             steps{
-                script{
-                    def DESTROY_APPROVED = input(
-                        message: "Destroy ${ENV_NAME} !?!",
-                        ok: "Yes",
-                        parameters: [
-                            choice(name: 'DESTROY_APPROVED', choices: [ 'No', 'Yes' ], description: 'Are you sure??') 
-                        ]
-                    )
-                    if (DESTROY_APPROVED != 'Yes') {
-						error "User cancelled"
-					}
+                dir("${ENV_NAME}"){
+                    script{
+                        def DESTROY_APPROVED = input(
+                            message: "Destroy ${ENV_NAME} !?!",
+                            ok: "Yes",
+                            parameters: [
+                                choice(name: 'DESTROY_APPROVED', choices: [ 'No', 'Yes' ], description: 'Are you sure??') 
+                            ]
+                        )
+                        if (DESTROY_APPROVED != 'Yes') {
+                            error "User cancelled"
+                        }
+                    }
+                    sh "terraform destroy -auto-approve"
                 }
-                sh "terraform destroy -auto-approve"
             }
         }
     }
