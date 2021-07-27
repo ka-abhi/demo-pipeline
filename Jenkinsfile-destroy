@@ -13,6 +13,9 @@ pipeline{
         string (name: 'ENV_NAME',
 			   defaultValue: 'tf-dev',
 			   description: 'Env name')
+        string (name: 'REGION_NAME',
+			   defaultValue: 'us-east-1',
+			   description: 'Region name')
         choice (name: 'ACTION',
 				choices: [ 'plan', 'apply', 'destroy'],
 				description: 'Run terraform plan / apply / destroy')
@@ -43,7 +46,7 @@ pipeline{
             }
             steps{
                 dir("${ENV_NAME}"){
-                    sh "terraform plan -out=tfplan"
+                    sh "terraform plan -var "region=\"${REGION_NAME}\"" -var "vpc_availability_zones=[\"${REGION_NAME}a\",\"${REGION_NAME}b\"]" -var "environment=\"${ENV_NAME}\"" -out=tfplan"
                 }
             }
         }
@@ -81,6 +84,11 @@ pipeline{
                     }
                     sh "terraform destroy -auto-approve"
                 }
+            }
+        }
+        stage('Clean Workspace') {
+            steps{
+                cleanWS()
             }
         }
     }
