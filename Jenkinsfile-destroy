@@ -43,7 +43,7 @@ pipeline{
             }
             steps{
                 dir("${ENV_NAME}"){
-                    sh "terraform plan -var 'environment=\"${ENV_NAME}\"' -out=tfplan"
+                    sh "terraform plan -var 'environment=${ENV_NAME}' -out=tfplan"
                 }
             }
         }
